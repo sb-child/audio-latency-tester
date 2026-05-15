@@ -1,0 +1,32 @@
+# 音频输出模块
+[audio]
+
+# backend 目前支持 "pipewire", "alsa"
+backend = "pipewire"
+
+# 缓冲区尺寸(buffer size / quantum)。更大的值可以避免音频卡顿，更小的值带来更低的延迟。
+buffer = 128
+
+# 音效模块
+[sample]
+
+# backend 目前支持 "fileloader"
+backend = "fileloader"
+
+# fileloader 模式: 指定 wav 文件路径，相对于工作目录(working directory)或指定绝对路径。长度不建议超过 100ms。
+filename = "1500hz-100ms.wav"
+
+# fileloader 模式: 目标采样率(sample rate)，不指定(删掉或注释掉)则跟随源文件采样率，如果指定值不等于源文件采样率则自动转换(resampling)。
+rate = 48000
+
+# 触发器模块
+[trigger]
+
+# backend 目前支持 "evdev"
+backend = "evdev"
+
+# evdev 模式: 键码，可输入数字(u16)或字符串，参考<https://github.com/torvalds/linux/blob/master/include/uapi/linux/input-event-codes.h>。
+keycode = "BTN_LEFT"
+
+# evdev 模式: 要监听的输入设备，绝对路径，通常为"/dev/input/event[编号]"或"/dev/input/by-id/[设备名]"。你需要有打开目标设备的权限。参考`ls -l /dev/input/by-id/`的输出。
+device = "/dev/input/event11"
