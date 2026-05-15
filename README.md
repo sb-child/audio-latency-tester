@@ -1,6 +1,6 @@
 # Audio Latency Tester
 
-音频延迟测试工具，给音游痴们调教用的。
+音频延迟测试工具，<sub>调校</sub>调教音游痴们用的。
 
 ## how to use
 
