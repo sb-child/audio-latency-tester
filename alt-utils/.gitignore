@@ -1,0 +1,15 @@
+# Virtual environments (uv's default location)
+.venv/
+
+# Lockfiles (Crucial: Read the note below)
+# uv.lock
+
+# Python version management
+.python-version
+
+# Standard Python ignores (compiled code, caches)
+__pycache__/
+*.py[oc]
+build/
+dist/
+*.egg-info/

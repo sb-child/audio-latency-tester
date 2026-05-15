@@ -16,6 +16,8 @@
 
 一切准备就绪，日志都是绿的，你按下触发键，扬声器立刻播放尖锐的声波。that's all.
 
+你录音之后可以用 `alt-utils/clicks.py` 节省你宝贵的眼睛和时间，再用 `alt-utils/avg.py` 算出你设备的水平。
+
 ## why
 
 这是我第3次试图搞清楚 [osu!lazer](https://github.com/ppy/osu) 在我系统上的音频滞后的根源。
@@ -33,12 +35,13 @@
 
 本次测试运行在搭载**AMD Ryzen 5 4600U**的Fedora笔记本上。
 
+- 程序: **audio-latency-tester**
 - 声卡**iBasso Macaron**直连主机。数字滤波器**Short delay Fast roll off**。耳机型号**Sennheiser HD600**。
 - 鼠标**logitech G502 Hero**通过USB Hub连接主机。触发键为鼠标左键。后端 `evdev`。
 - 录音设备，手机距离扬声器和鼠标5cm内。
 - 音频后端: **pipewire**: (`native`), **alsa**: (`cpal` -> `pipewire-alsa`)
 
-| 音频后端 | 客户端设置         | 输出设备设置         | 实测延迟(ms) n=10    |
+| 音频后端 | 客户端设置         | 声卡设置             | 实测延迟(ms) n=10    |
 | -------- | ------------------ | -------------------- | -------------------- |
 | pipewire | 512/44100 F32LE    | 32/44100 S32LE       | avg=20.1 sd=3.51     |
 | pipewire | 256/44100 F32LE    | 32/44100 S32LE       | avg=17.6 sd=1.65     |
@@ -57,13 +60,13 @@
 
 接下来是 **osu!lazer**。
 
-- 版本: **2026.513.0-tachyon**。环境变量 `OSU_SDL3=true`。
+- 程序: **osu! 2026.513.0-tachyon**。环境变量 `OSU_SDL3=true`。
 - 音频后端: `BASS` -> `pipewire-alsa`。
 - 窗管: **niri**，禁用 xwayland。
 - 测量鼠标按键按下到 Hit Sound 播放的间隔。
 - 作为热身，在测量结果中排除第一个note。
 
-| `PIPEWIRE_LATENCY` | 输出设备设置   | 实测延迟(ms) n=55 |
+| `PIPEWIRE_LATENCY` | 声卡设置       | 实测延迟(ms) n=55 |
 | ------------------ | -------------- | ----------------- |
 | 64/44100           | 64/44100 S32LE | avg=39.95 sd=3.08 |
 | 256/44100          | 64/44100 S32LE | avg=38.69 sd=3.11 |
@@ -72,10 +75,64 @@
 
 好像 `PIPEWIRE_LATENCY` 什么都没做一样，虽然 `pw-top` 如预期显示。
 
-| 输出设备设置     | 实测延迟(ms) n=55 |
+| 声卡设置         | 实测延迟(ms) n=55 |
 | ---------------- | ----------------- |
 | 64/96000 S32LE   | avg=30.62 sd=3.29 |
 | 128/192000 S32LE | avg=29.49 sd=3.53 |
 | 256/384000 S32LE | avg=29.25 sd=3.34 |
 
 未指定 `PIPEWIRE_LATENCY`，调高输出设备的采样率，只能降低约8ms延迟。
+
+> 以上结果都是我对着Audacity挨个量的。然后接下来让 `alt-utils` 帮我，通常比人工标注多出1.5ms，但是它可复现。
+
+| 声卡设置         | 实测延迟(ms) n=55 |
+| ---------------- | ----------------- |
+| 64/44100 S32LE   | avg=41.23 sd=3.19 |
+| 64/48000 S32LE   | avg=40.42 sd=3.28 |
+| 64/88200 S32LE   | avg=32.44 sd=3.26 |
+| 64/96000 S32LE   | avg=31.12 sd=4.18 |
+| 128/176400 S32LE | avg=30.46 sd=3.41 |
+| 128/192000 S32LE | avg=30.15 sd=3.58 |
+| 256/352800 S32LE | avg=31.09 sd=3.17 |
+| 256/384000 S32LE | avg=30.16 sd=3.42 |
+
+现在osu卡在了30ms的瓶颈。**那换用pro-audio模式就能改善音频延迟吗？**
+
+```bash
+# 设置为模拟输出。声卡标识变为 alsa_output.usb-iBasso_Macaron-01.analog-stereo
+$ pactl set-card-profile alsa_card.usb-iBasso_Macaron-01 output:analog-stereo
+# 设置为专业音频。声卡标识变为 alsa_output.usb-iBasso_Macaron-01.pro-output-0
+$ pactl set-card-profile alsa_card.usb-iBasso_Macaron-01 pro-audio
+```
+
+- 程序: **audio-latency-tester**。
+- 音频后端: **pipewire**。
+- 声卡设置: **64/44100 S32LE**。
+
+| 客户端设置         | 声卡模式          | 实测延迟(ms) n=20     |
+| ------------------ | ----------------- | --------------------- |
+| 512/44100 F32LE    | pro-audio         | avg=27.00 sd=4.08     |
+| 256/44100 F32LE    | pro-audio         | avg=24.51 sd=1.62     |
+| 64/44100 F32LE     | pro-audio         | avg=22.30 sd=1.13     |
+| **32/44100 F32LE** | **pro-audio**     | **avg=22.29 sd=0.87** |
+| 512/44100 F32LE    | analog-stereo     | avg=28.22 sd=4.07     |
+| 256/44100 F32LE    | analog-stereo     | avg=24.52 sd=1.94     |
+| 64/44100 F32LE     | analog-stereo     | avg=22.58 sd=1.61     |
+| **32/44100 F32LE** | **analog-stereo** | **avg=22.49 sd=1.22** |
+
+音频服务器这边收效甚微。那声卡的极限呢？
+
+- 客户端设置: **64/48000**。
+
+> 以下数据好像有问题, todo
+
+| 声卡设置             | 声卡模式          | 实测延迟(ms) n=20     |
+| -------------------- | ----------------- | --------------------- |
+| 32/48000 F32LE       | pro-audio         | avg=40.93 sd=0.91     |
+| 64/96000 F32LE       | pro-audio         | avg=38.25 sd=0.81     |
+| 128/192000 F32LE     | pro-audio         | avg=36.61 sd=0.73     |
+| **256/384000 F32LE** | **pro-audio**     | **avg=35.92 sd=0.73** |
+| 32/48000 F32LE       | analog-stereo     | avg=41.46 sd=0.59     |
+| 64/96000 F32LE       | analog-stereo     | avg=39.07 sd=1.02     |
+| 128/192000 F32LE     | analog-stereo     | avg=36.73 sd=0.87     |
+| **256/384000 F32LE** | **analog-stereo** | **avg=35.94 sd=0.76** |

@@ -14,9 +14,9 @@ buffer = 128
 backend = "fileloader"
 
 # fileloader 模式: 指定 wav 文件路径，相对于工作目录(working directory)或指定绝对路径。长度不建议超过 100ms。
-filename = "1500hz-100ms.wav"
+filename = "1500hz-100ms-48000.wav"
 
-# fileloader 模式: 目标采样率(sample rate)，不指定(删掉或注释掉)则跟随源文件采样率，如果指定值不等于源文件采样率则自动转换(resampling)。
+# fileloader 模式: 目标采样率(sample rate)，不指定(删掉或注释掉)则跟随源文件采样率，如果指定值不等于源文件采样率则自动转换(resampling)，但不推荐这样做，会损失一点东西。
 rate = 48000
 
 # 触发器模块

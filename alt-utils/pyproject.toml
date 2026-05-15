@@ -1,0 +1,13 @@
+[project]
+name = "alt-utils"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.14"
+dependencies = [
+    "audioop-lts>=0.2.2",
+    "numpy>=2.4.4",
+    "prompt-toolkit>=3.0.52",
+    "pydub>=0.25.1",
+    "scipy>=1.17.1",
+]
