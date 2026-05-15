@@ -31,27 +31,51 @@
 
 ## result
 
-本次测试运行在搭载"AMD Ryzen 5 4600U"的Fedora笔记本上。
+本次测试运行在搭载**AMD Ryzen 5 4600U**的Fedora笔记本上。
 
-- 声卡"iBasso Macaron"直连主机。数字滤波器"Short delay Fast roll off"。耳机型号"Sennheiser HD600"。
-- 鼠标"logitech G502 Hero"通过USB Hub连接主机。触发键为鼠标左键。后端 `evdev`。
+- 声卡**iBasso Macaron**直连主机。数字滤波器**Short delay Fast roll off**。耳机型号**Sennheiser HD600**。
+- 鼠标**logitech G502 Hero**通过USB Hub连接主机。触发键为鼠标左键。后端 `evdev`。
 - 录音设备，手机距离扬声器和鼠标5cm内。
+- 音频后端: **pipewire**: (`native`), **alsa**: (`cpal` -> `pipewire-alsa`)
 
-| 音频 API                  | 客户端设置         | 输出设备设置         | 实测延迟(ms)              |
-| ------------------------- | ------------------ | -------------------- | ------------------------- |
-| 原生 pipewire             | 512/44100 F32LE    | 32/44100 S32LE       | avg=20.1 sd=3.51 n=10     |
-| 原生 pipewire             | 256/44100 F32LE    | 32/44100 S32LE       | avg=17.6 sd=1.65 n=10     |
-| 原生 pipewire             | 64/44100 F32LE     | 32/44100 S32LE       | avg=14.8 sd=1.32 n=10     |
-| 原生 pipewire             | **32/44100 F32LE** | 32/44100 S32LE       | **avg=15.0 sd=0.67 n=10** |
-| `cpal` -> `pipewire-alsa` | 512/44100 F32LE    | 32/44100 S32LE       | avg=30.4 sd=3.41 n=10     |
-| `cpal` -> `pipewire-alsa` | 256/44100 F32LE    | 32/44100 S32LE       | avg=26.1 sd=0.99 n=10     |
-| `cpal` -> `pipewire-alsa` | 64/44100 F32LE     | 32/44100 S32LE       | avg=17.2 sd=0.63 n=10     |
-| `cpal` -> `pipewire-alsa` | **58/44100 F32LE** | 32/44100 S32LE       | **avg=16.2 sd=0.63 n=10** |
-| 原生 pipewire             | 32/44100 F32LE     | 32/48000 S32LE       | avg=14.9 sd=0.88 n=10     |
-| 原生 pipewire             | 32/44100 F32LE     | 64/96000 S32LE       | avg=12.0 sd=0.67 n=10     |
-| 原生 pipewire             | 32/44100 F32LE     | 128/192000 S32LE     | avg=10.0 sd=0.67 n=10     |
-| 原生 pipewire             | 32/44100 F32LE     | **256/384000 S32LE** | **avg=9.5 sd=0.53 n=10**  |
+| 音频后端 | 客户端设置         | 输出设备设置         | 实测延迟(ms) n=10    |
+| -------- | ------------------ | -------------------- | -------------------- |
+| pipewire | 512/44100 F32LE    | 32/44100 S32LE       | avg=20.1 sd=3.51     |
+| pipewire | 256/44100 F32LE    | 32/44100 S32LE       | avg=17.6 sd=1.65     |
+| pipewire | 64/44100 F32LE     | 32/44100 S32LE       | avg=14.8 sd=1.32     |
+| pipewire | **32/44100 F32LE** | 32/44100 S32LE       | **avg=15.0 sd=0.67** |
+| alsa     | 512/44100 F32LE    | 32/44100 S32LE       | avg=30.4 sd=3.41     |
+| alsa     | 256/44100 F32LE    | 32/44100 S32LE       | avg=26.1 sd=0.99     |
+| alsa     | 64/44100 F32LE     | 32/44100 S32LE       | avg=17.2 sd=0.63     |
+| alsa     | **58/44100 F32LE** | 32/44100 S32LE       | **avg=16.2 sd=0.63** |
+| pipewire | 32/44100 F32LE     | 32/48000 S32LE       | avg=14.9 sd=0.88     |
+| pipewire | 32/44100 F32LE     | 64/96000 S32LE       | avg=12.0 sd=0.67     |
+| pipewire | 32/44100 F32LE     | 128/192000 S32LE     | avg=10.0 sd=0.67     |
+| pipewire | 32/44100 F32LE     | **256/384000 S32LE** | **avg=9.5 sd=0.53**  |
 
 为什么没有用板载声卡？因为它播放100毫秒的音频很吃力会逐渐变成锯齿声，虽然它的最低延迟实测不大于5ms。
 
-关于 osu!lazer 的测试你等我一会。
+接下来是 **osu!lazer**。
+
+- 版本: **2026.513.0-tachyon**。环境变量 `OSU_SDL3=true`。
+- 音频后端: `BASS` -> `pipewire-alsa`。
+- 窗管: **niri**，禁用 xwayland。
+- 测量鼠标按键按下到 Hit Sound 播放的间隔。
+- 作为热身，在测量结果中排除第一个note。
+
+| `PIPEWIRE_LATENCY` | 输出设备设置   | 实测延迟(ms) n=55 |
+| ------------------ | -------------- | ----------------- |
+| 64/44100           | 64/44100 S32LE | avg=39.95 sd=3.08 |
+| 256/44100          | 64/44100 S32LE | avg=38.69 sd=3.11 |
+| 512/44100          | 64/44100 S32LE | avg=38.89 sd=2.94 |
+| 未指定(441/44100)  | 64/44100 S32LE | avg=38.93 sd=3.01 |
+
+好像 `PIPEWIRE_LATENCY` 什么都没做一样，虽然 `pw-top` 如预期显示。
+
+| 输出设备设置     | 实测延迟(ms) n=55 |
+| ---------------- | ----------------- |
+| 64/96000 S32LE   | avg=30.62 sd=3.29 |
+| 128/192000 S32LE | avg=29.49 sd=3.53 |
+| 256/384000 S32LE | avg=29.25 sd=3.34 |
+
+未指定 `PIPEWIRE_LATENCY`，调高输出设备的采样率，只能降低约8ms延迟。
