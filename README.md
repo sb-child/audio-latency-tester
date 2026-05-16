@@ -124,15 +124,13 @@ $ pactl set-card-profile alsa_card.usb-iBasso_Macaron-01 pro-audio
 
 - 客户端设置: **64/48000**。
 
-> 以下数据好像有问题, todo
-
 | 声卡设置             | 声卡模式          | 实测延迟(ms) n=20     |
 | -------------------- | ----------------- | --------------------- |
-| 32/48000 F32LE       | pro-audio         | avg=40.93 sd=0.91     |
-| 64/96000 F32LE       | pro-audio         | avg=38.25 sd=0.81     |
-| 128/192000 F32LE     | pro-audio         | avg=36.61 sd=0.73     |
-| **256/384000 F32LE** | **pro-audio**     | **avg=35.92 sd=0.73** |
-| 32/48000 F32LE       | analog-stereo     | avg=41.46 sd=0.59     |
-| 64/96000 F32LE       | analog-stereo     | avg=39.07 sd=1.02     |
-| 128/192000 F32LE     | analog-stereo     | avg=36.73 sd=0.87     |
-| **256/384000 F32LE** | **analog-stereo** | **avg=35.94 sd=0.76** |
+| 32/48000 F32LE       | pro-audio         | avg=15.76 sd=0.73     |
+| 64/96000 F32LE       | pro-audio         | avg=13.19 sd=0.80     |
+| 128/192000 F32LE     | pro-audio         | avg=11.58 sd=0.72     |
+| **256/384000 F32LE** | **pro-audio**     | **avg=10.65 sd=0.62** |
+| 32/48000 F32LE       | analog-stereo     | avg=15.77 sd=0.95     |
+| 64/96000 F32LE       | analog-stereo     | avg=13.01 sd=0.90     |
+| 128/192000 F32LE     | analog-stereo     | avg=11.83 sd=1.41     |
+| **256/384000 F32LE** | **analog-stereo** | **avg=10.45 sd=0.80** |
